@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Student</title>
+  <style>
+    /* Reset */
+    body, h2, label, input, select, button {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .form-container {
+      background: #fff;
+      padding: 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, select:focus {
+      border-color: #4CAF50;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Add New Student</h2>
+    <form action="add_student.php" method="POST">
+      <label for="first_name">First Name:</label>
+      <input type="text" id="first_name" name="first_name" required>
+
+      <label for="last_name">Last Name:</label>
+      <input type="text" id="last_name" name="last_name" required>
+
+      <label for="admission_number">Admission Number:</label>
+      <input type="text" id="admission_number" name="admission_number" >
+
+      <label for="grade_level">Grade Level:</label>
+      <select id="grade_level" name="grade_level" required>
+        <option value="PG">PG</option>
+        <option value="PP1">PP1</option>
+        <option value="PP2">PP2</option>
+        
+        <option value="1">Grade 1</option>
+        <option value="2">Grade 2</option>
+        <option value="3">Grade 3</option>
+        <option value="4">Grade 4</option>
+        <option value="5">Grade 5</option>
+        <option value="6">Grade 6</option>
+        <option value="7">Grade 7</option>
+        <option value="8">Grade 8</option>
+        <option value="9">Grade 9</option>
+      </select>
+
+      <label for="stream">Stream:</label>
+      <select id="stream" name="stream" required>
+        <option value="West">West</option>
+        <option value="East">East</option>
+        <option value="North">North</option>
+        <option value="South">South</option>
+      </select>
+
+      <label for="boarding_status">Boarding Status:</label>
+      <select id="boarding_status" name="boarding_status" required>
+        <option value="Boarding">Boarding</option>
+        <option value="Day">Day</option>
+      </select>
+
+      <button type="submit">Add Student</button>
+    </form>
+  </div>
+  
+</body>
+</html>

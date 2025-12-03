@@ -1,0 +1,4035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School SMS System</title>
+<style>  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+  :root{
+  --sidebar-width: 15vw;   /* change if your sidebar width differs */
+  --header-height: 30px;    /* set this to match your header height */
+  --footer-height: 70px;    /* set this to match your footer height */
+  --max-content-width: 1400px;
+}
+  body {
+    background-color: #f5f7fb;
+    display: flex;
+    min-height: 100vh;
+    flex-wrap: nowrap; /* prevent wrapping */
+    
+    
+  }
+  .sidebar {
+    width: var(--sidebar-width);
+    background: #2c3e50;
+    color: #fff;
+    padding: 20px 0;
+    flex: 0 0 var(--sidebar-width);
+  }
+  .sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .sidebar h3 {
+    text-align: center;
+    
+  }
+  .sidebar ul {
+    list-style: none;
+  }
+   
+  .sidebar ul li {
+    padding: 1.5vh 1.5vw; /* 15px vertical, 20px horizontal */
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .sidebar ul li:hover {
+    background: #34495e;
+  }
+  /* MAIN CONTENT (fixed) */
+.main-content {
+  /* ❌ removed margin-left — sidebar already fixed on the left */
+  padding-top: var(--header-height);   /* keep content below fixed header */
+  padding-left: 20px;
+  padding-right: 20px;
+  overflow: hidden;
+  /* take remaining viewport height but allow child to scroll */
+  height: calc(100vh - var(--header-height));
+  box-sizing: border-box;
+
+  display: block;   /* instead of flex */
+  
+
+  
+}
+header {
+    flex: 0 0 auto;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: calc(100% - var(--sidebar-width));
+    padding: 15px 30px;
+    margin: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+#welcomeUser {
+    font-weight: 500;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    color: #34495e;
+    margin: 0;
+    padding: 8px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fff;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+header h1 {
+    margin: 0;
+    text-align: center;
+    font-weight: 600;
+    font-size: 24px;
+    color: #2c3e50;
+    /* Use flexbox to center instead of absolute positioning */
+    flex: 1;
+    order: 2;
+}
+header::before {
+    content: '';
+    width: 300px; /* Match welcome message approximate width */
+    order: 1;
+    visibility: hidden;
+}
+/* INNER SCROLLING AREA */
+.content-area,
+.section {
+  /* allow this element to grow and become the scrollable area */
+  flex: 1 1 auto;
+
+  /* IMPORTANT: allows flex child to shrink so overflow works */
+  min-height: 0;
+
+  /* the actual scroll behavior */
+  
+
+  /* keep your padding */
+  padding: 20px;
+  box-sizing: border-box;
+  
+  /* prevent footer overlap: add bottom padding at least equal to footer height */
+  padding-bottom: calc(var(--footer-height) + 20px);
+}
+/* the actual page content below header */
+.content-area {
+  width: 100vw;        /* full width inside main-content */
+  max-width: none;    /* no artificial limiting */
+  margin: 0;          /* no auto-centering */
+  padding: 20px;
+  overflow: visible;
+  padding-bottom: calc(var(--footer-height) + 20px);
+  box-sizing: border-box;
+  padding-right: 0;
+}
+  
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* always 4 equal columns */
+  gap: 2vw; /* 30px → 2% of viewport width */
+  width: 75vw;
+  margin: 4vh 0; /* 40px → 4% of viewport height */
+}
+  
+.card { 
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.5vw; /* 20px → 1.5% of viewport width */
+  background: #fff;
+  padding: 2vh 1.5vw; /* 20px → 2% vh and 1.5% vw */
+  border-radius: 0.8vw; /* 12px → 0.8% of viewport width */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease-in-out;
+  min-height: 15vh; /* Added for consistent card height */
+}
+
+.card:hover {
+  transform: translateY(-0.8vh); /* 8px → 0.8% of viewport height */
+}
+
+.card img {
+  width: 3.5vw; /* 50px → 3.5% of viewport width */
+  height: 3.5vw; /* 50px → 3.5% of viewport width */
+  flex-shrink: 0;
+  min-width: 40px; /* Fallback for very small screens */
+  min-height: 40px; /* Fallback for very small screens */
+}
+
+.card-content {
+  text-align: left;
+  flex: 1;
+}
+
+.card h3 {
+  font-size: 1.3vw; /* 18px → 1.3% of viewport width */
+  color: #555;
+  margin: 0 0 0.5vh; /* 5px → 0.5% of viewport height */
+}
+ 
+.card p {
+  font-size: 1.8vw; /* 26px → 1.8% of viewport width */
+  font-weight: bold;
+  color: #2c3e50;
+  margin: 0;
+}
+ 
+.recent-activity {
+  margin-top: 3vh; /* 30px → 3% of viewport height */
+  background: #fff;
+  border-radius: 0.8vw; /* 12px → 0.8% of viewport width */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 2vh 1.5vw; /* 20px → 2% vh and 1.5% vw */
+  max-width: 75vw;
+}
+
+.recent-activity h2 {
+  font-size: 1.4vw; /* 20px → 1.4% of viewport width */
+  margin-bottom: 1.5vh; /* 15px → 1.5% of viewport height */
+  color: #2c3e50;
+}
+
+.recent-activity ul {
+  list-style: none;
+  padding: 0;
+}
+
+.recent-activity ul li {
+  padding: 1vh 0; /* 10px → 1% of viewport height */
+  border-bottom: 1px solid #eee;
+  font-size: 1.1vw; /* 15px → 1.1% of viewport width */
+  color: #555;
+}
+
+.recent-activity ul li:last-child {
+  border-bottom: none;
+}
+
+ 
+select, textarea, button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+button {
+  background: #3498db;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+button:hover {
+  background: #2980b9;
+}
+#messages{
+  width: 75vw;
+}
+#messages h1 {
+  width: 100%;
+}
+
+.report-card,
+.messages {
+  margin: 20px 0;   /* top/bottom only */
+  
+}
+
+#messages {
+  padding: 2vh 2vw;
+}
+
+#messages h1 {
+  font-size: 2vw;
+  margin-bottom: 2vh;
+  color: #2c3e50;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.5vh;
+}
+
+#messages label {
+  font-size: 1.2vw;
+  font-weight: 600;
+  color: #34495e;
+  margin: 1.5vh 0 0.8vh 0;
+  display: block;
+}
+
+#messages select, 
+#messages textarea {
+  width: 100%;
+  padding: 1.2vh 1.5vw;
+  margin: 0.8vh 0 1.5vh 0;
+  border: 1px solid #ccc;
+  border-radius: 0.6vw;
+  font-size: 1.1vw;
+  background: #fff;
+  transition: border-color 0.3s ease;
+}
+
+#messages select:focus,
+#messages textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+#messages textarea {
+  min-height: 20vh;
+  resize: vertical;
+  font-family: Arial, sans-serif;
+  line-height: 1.4;
+}
+
+#messages button {
+  width: 100%;
+  padding: 1.5vh 2vw;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  border-radius: 0.6vw;
+  font-size: 1.3vw;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1vh;
+}
+
+#messages button:hover {
+  background: linear-gradient(135deg, #2980b9, #2573a7);
+  transform: translateY(-0.2vh);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+#messages button:active {
+  transform: translateY(0);
+}
+
+#statusMsg {
+  margin-top: 1.5vh;
+  padding: 1vh 1.5vw;
+  border-radius: 0.5vw;
+  font-size: 1.1vw;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Add to your existing CSS */
+#singleParentSection, #bulkMessageSection {
+    transition: all 0.3s ease;
+}
+
+#selectedStudentInfo {
+    border-left: 4px solid #3498db;
+    background: #f8f9fa !important;
+}
+
+input[type="radio"] {
+    margin-right: 5px;
+}
+
+label {
+    cursor: pointer;
+}
+
+.suggestions {
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Message cards styling */
+.message-card {
+  background: #fff;
+  padding: 2vh 1.5vw;
+  margin-bottom: 1.5vh;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.8vw;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-card:hover {
+  transform: translateY(-0.3vh);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.message-card h3 {
+  font-size: 1.4vw;
+  color: #2c3e50;
+  margin-bottom: 0.8vh;
+  font-weight: 600;
+}
+
+.message-card p {
+  color: #555;
+  font-size: 1.1vw;
+  line-height: 1.5;
+  margin: 0;
+}
+@media (max-width: 768px) {
+  #contacts-toolbar,
+  #pupils-filters {
+    flex-wrap: wrap;
+  }
+
+  #contacts-toolbar input,
+  #pupils-filters input,
+  #pupils-filters select {
+    flex: 1 1 100%;
+    min-width: unset;
+  }
+
+  #addContactBtn,
+  #addStudentBtn {
+    width: 100%;
+  }
+}
+
+/* General section styling */
+#contacts {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  width: 100vw;
+}
+ 
+/* Table styling */
+#contactsTable {
+  width: 80%;
+}
+
+/* Toolbar for contacts (search left, button right) */
+#contacts-toolbar {
+  display: flex;
+  gap:12px;
+  align-items: center;
+  margin: 0;
+  width: 80%;
+  flex-wrap: nowrap; /* keep horizontal unless very small screen */
+  border: none;
+  padding: 0;
+}
+
+#contacts-toolbar input[type="text"] {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 300px;
+  
+}
+
+#contacts-toolbar select {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  width: auto;   /* prevent full width stretching */
+}
+
+#addContactBtn {
+  width: auto;   /* prevent full width stretching */
+  margin: 0;     /* remove extra vertical spacing */
+  
+}
+ 
+/* Use fixed layout so column widths do not change with content */
+#contactsTable table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 0;      /* removes gap above */
+}
+ 
+/* Column widths (adjust percentages to taste) */
+/* This assumes columns are: (1) Guardian, (2) Phone, (3) Student, (4) Actions */
+#contactsTable th:nth-child(1),
+#contactsTable td:nth-child(1) { width: 40%; }   /* Guardian name */
+#contactsTable th:nth-child(2),
+#contactsTable td:nth-child(2) { width: 18%; }   /* Phone */
+#contactsTable th:nth-child(3),
+#contactsTable td:nth-child(3) { width: 32%; }   /* Student */
+#contactsTable th:nth-child(4),
+#contactsTable td:nth-child(4) { width: 10%; }   /* Actions */
+ 
+/* Ellipsis for overflowing text so rows don't expand */
+#contactsTable td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+ 
+/* Optional: make the header stick if you like */
+#contactsTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+ 
+/* Debug box styling */
+#debugOutput {
+  margin-top: 20px;
+  background: #fdfdfd !important;
+  border-radius: 5px;
+}
+ 
+/* Pagination styling */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 15px;
+}
+  
+.pagination button {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  background:silver ;
+  cursor: pointer;
+  border-radius: 4px;
+  min-width: 44px;
+}
+
+ 
+.pagination button.active {
+  background: #007bff;
+  color: white;
+}
+ 
+.pagination button:disabled {
+  background: #eee;
+  cursor: not-allowed;
+}
+ 
+ 
+/*******Home*****/
+ 
+.nav{
+  background: #fff;
+  display: flex;
+  justify-content: space-around;
+  line-height: 60px;
+  z-index: 100;
+}
+
+.logo{
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.logo-icon {
+  width: 90px;     /* fixed sensible width */
+  height: auto;
+  display: block;
+  margin: 12px auto;  /* centered in sidebar */
+  object-fit: contain;
+  max-width: 100%;
+}
+
+
+.right-links{
+  padding: 0 10px;
+}
+
+main{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+footer { 
+  background: #791212; 
+  border-top: 1px solid #ccc; 
+  text-align: center; 
+  padding: 5px 10px; 
+  font-size: 11px; 
+  line-height: 1.4; 
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  width: 100%;
+}
+footer img {
+  height: 50px;
+}
+/*Hide section*/
+.section {
+  display: none;
+  height: calc(100vh - var(--header-height) - var(--footer-height) - 40px);
+  overflow-y: auto;
+  padding: 20px;
+  margin: 0;
+  padding-right: 0;
+  width: 100vw;
+}
+/* General heading styles */
+h1, h2, h3 {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 600;
+  color: #2c3e50;
+ margin-top: 15px;
+}
+/* Section titles */
+.section h1 {
+  font-size: 24px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 5px;
+  width: 75%;
+}
+
+/* Sub-headings */
+.section h2 {
+  font-size: 20px;
+  color: #34495e;
+  margin-top: 15px;
+}
+
+.section h3 {
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 10px;
+  color: #555;
+}
+
+
+.section.active {
+  display: block;
+}
+/* Overlay background */
+.modal {
+  display: none; /* hidden by default */
+  position: fixed;
+  z-index: 1000; /* stays on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.6); /* dark background */
+}
+ 
+/* Modal box */
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Close button */
+.close-btn {
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+}
+.close-btn:hover {
+  color: #e74c3c;
+}
+ 
+/* add contact modal Form styling */
+.modal-content {
+  position: relative; /* required for absolute close-btn */
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 95%;
+  margin: 10% auto;
+}
+ 
+ 
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+  
+.modal-content label {
+  margin-top: 10px;
+  font-weight: bold;
+}
+  
+.modal-content input,
+.modal-content select {
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+  
+.modal-content button {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal-content button:hover {
+  background-color: #2980b9;
+}
+ 
+/* Position close button in the top-left corner */
+/* Modal Close Button */
+.close-btn {
+  position: absolute;
+  top: -10px;      /* Move above heading */
+  right: 5px;    /* Nudge slightly outside modal border */
+  background-color: #e74c3c;  /* Red shade */
+  color: white;
+  font-size: 22px; /* Slightly bigger than before */
+  font-weight: bold;
+  border: none;
+  border-radius: 50%;  /* Circular button */
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+  
+  
+.close-btn:hover {
+  background: #c0392b;  /* darker red on hover */
+  transform: scale(1.1);
+}
+ 
+ 
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.suggestions {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  width: calc(100% - 20px);
+  margin-top: 2px;
+  display: none;
+  z-index: 2000;
+}
+  
+.suggestions div {
+  padding: 8px;
+  cursor: pointer;
+}
+  
+.suggestions div:hover {
+  background-color: #f0f0f0;
+}
+ 
+/* Suggestions dropdown */
+.suggestions-box {
+  border: 1px solid #ccc;
+  background: white;
+  max-height: 150px;
+  overflow-y: auto;
+  display: none;
+  position: absolute;
+  width: 100%;
+  z-index: 1000;
+}
+.suggestions-box div {
+  padding: 8px;
+  cursor: pointer;
+ }
+.suggestions-box div:hover {
+  background: #f0f0f0;
+}
+
+/* Suggestions dropdown under the student search input */
+#studentSuggestions {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  z-index: 2000; /* keep above modal */
+}
+
+#studentSuggestions div {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+#studentSuggestions div:hover {
+  background-color: #f5f5f5;
+}
+/* ===== MESSAGING SEARCH BAR STYLES ===== */
+
+/* Student Search Container */
+#studentSearch {
+    width: 100%;
+    padding: 12px 16px;
+    margin: 8px 0 16px 0;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+/* Search Input Focus State */
+#studentSearch:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    background: #fafbfc;
+}
+
+/* Search Input Placeholder */
+#studentSearch::placeholder {
+    color: #a0aec0;
+    font-style: italic;
+}
+
+/* Search Input Hover State */
+#studentSearch:hover {
+    border-color: #cbd5e0;
+    background: #f7fafc;
+}
+
+/* Suggestions Dropdown */
+#studentSearchSuggestions {
+    position: absolute;
+    background: #ffffff;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: calc(100% - 4px); /* Account for border */
+    margin-top: 2px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Individual Suggestion Items */
+#studentSearchSuggestions div {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+    color: #2d3748;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+/* Suggestion Hover State */
+#studentSearchSuggestions div:hover {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    transform: translateX(4px);
+}
+
+/* Remove border from last suggestion */
+#studentSearchSuggestions div:last-child {
+    border-bottom: none;
+}
+
+/* Suggestion Icon (optional) */
+#studentSearchSuggestions div::before {
+    content: "👤";
+    margin-right: 8px;
+    font-size: 12px;
+}
+
+/* Search Container Positioning */
+#singleParentSection {
+    position: relative;
+}
+
+/* Selected Student Info Styling */
+#selectedStudentInfo {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0) !important;
+    border-left: 4px solid #3498db !important;
+    padding: 16px !important;
+    margin: 16px 0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Selected Student Info Text */
+#selectedStudentInfo strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+#selectedStudentInfo span {
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* Loading State for Search */
+#studentSearch.loading {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233498db' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12a9 9 0 11-6.219-8.56'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+/* Search Icon (optional) */
+.search-container {
+    position: relative;
+}
+
+.search-container::before {
+    content: "🔍";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0aec0;
+    z-index: 1;
+}
+
+.search-container input {
+    padding-left: 40px !important;
+}
+
+/* Responsive Design for Search */
+@media (max-width: 768px) {
+    #studentSearch {
+        padding: 14px 16px;
+        font-size: 16px; /* Better for mobile touch */
+    }
+    
+    #studentSearchSuggestions {
+        width: 100%;
+        max-height: 180px;
+    }
+    
+    #studentSearchSuggestions div {
+        padding: 14px 16px;
+        font-size: 15px;
+    }
+}
+
+/* Animation for search results */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Scrollbar styling for suggestions */
+#studentSearchSuggestions::-webkit-scrollbar {
+    width: 6px;
+}
+
+#studentSearchSuggestions::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 0 8px 8px 0;
+}
+
+#studentSearchSuggestions::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+#studentSearchSuggestions::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+/* ===== SMS CALCULATOR STYLES ===== */
+#smsCalculator {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0) !important;
+    border: 1px solid #e1e8ed !important;
+    border-left: 4px solid #3498db !important;
+}
+
+#charCount, #smsSegments, #encodingType, #estimatedCost {
+    color: #2c3e50;
+    font-weight: 600;
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 4px;
+    margin-left: 4px;
+}
+
+#estimatedCost {
+    color: #e74c3c;
+}
+
+/* Warning state for long messages */
+#smsCalculator.warning {
+    border-left-color: #f39c12 !important;
+    background: linear-gradient(135deg, #fef9e7, #fdebd0) !important;
+}
+
+#smsCalculator.critical {
+    border-left-color: #e74c3c !important;
+    background: linear-gradient(135deg, #fdedec, #fadbd8) !important;
+}
+
+/* Character count colors */
+#charCount.near-limit {
+    color: #f39c12;
+}
+
+#charCount.over-limit {
+    color: #e74c3c;
+}
+  /**/
+  
+/* --- Table row smaller height --- */
+#contactsTable th,
+#contactsTable td {
+  padding: 10px 12px;   /* same as pupils */
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  font-size: 14px;
+}
+#contactsTable th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+  
+  /* --- Action buttons side by side --- */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+ justify-content: center;
+}
+  
+/* --- Action buttons style --- */
+.action-buttons button {
+  padding: 4px 10px;
+  font-size: 13px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+  
+/* Edit button (blue) */
+.action-buttons .edit-btn {
+  background-color: #3498db;
+  color: #fff;
+}
+.action-buttons .edit-btn:hover {
+  background-color: #2980b9;
+}
+  
+/* Delete button (red) */
+.action-buttons .delete-btn {
+  background-color: #e74c3c;
+  color: #fff;
+}
+.action-buttons .delete-btn:hover {
+  background-color: #c0392b;
+}
+/*pupils section*/
+/* Pupils Table */
+/* Filters styling */
+/* Filters toolbar */
+#pupils-filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 15px;
+  flex-wrap: nowrap; /* keep everything in one row unless screen is too small */
+  width: 80%;
+}
+
+/* Group the filters (so they don’t push the Add Student button down) */
+#pupils-filters .filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap; /* force horizontal arrangement */
+}
+
+/* Filters styling */
+/* Consistent select & input styling */
+#pupils select,
+#pupils input[type="text"] {
+  padding: 8px 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  transition: border-color 0.2s;
+   width: auto;         /* don’t stretch full */
+  min-width: 140px;    /* ensure not too tiny */
+  flex: 0 0 auto;
+}
+#pupils select:focus,
+#pupils input[type="text"]:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+/* Search box wider */
+#searchInput {
+  width: 200px;
+}
+
+/* Table styling */
+/* Make table span full width */
+#pupilsTable {
+  width: 80%;
+}
+#pupilsTable table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;  /* makes it fill container evenly */
+}
+
+
+#pupils th,
+#pupils td {
+  padding: 10px 12px;   /* column spacing */
+  border-bottom: 1px solid #ddd; /* row borders */
+  text-align: left;
+}
+
+/* Table header */
+#pupils th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+#pupilsPagination {
+  width: 80%;
+}
+
+/* Add Student Button */
+#addStudentBtn {
+  padding: 8px 14px;
+  font-size: 14px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+  white-space: nowrap; /* keeps text on one line */
+  width: auto;         /* button should fit content */
+  flex: 0 0 auto;      /* don’t stretch */
+}
+#addStudentBtn:hover {
+  background: #219150;
+}
+
+/* Action buttons */
+.table-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.table-actions button {
+  padding: 4px 8px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.table-actions button:first-child {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.table-actions button:last-child {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.table-actions button:hover {
+  opacity: 0.85;
+}
+/*------Reports section-----*/
+/* Reports Section */
+#reports {
+  padding: 20px;
+
+}
+
+.report-card {
+  
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  padding: 15px;
+  width: 80%;
+}
+
+.report-card h2 {
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: #c0392b; /* highlight error category */
+}
+
+.report-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.report-card th,
+.report-card td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.report-card th {
+  background: #f8f8f8;
+}
+
+/* SMS Reports Section - Fixed Width */
+#sms-reports {
+    padding: 20px;
+    width: 80vw; /* Match the width of your other sections */
+    max-width: 80vw;
+    margin: 0;
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+}
+
+#sms-reports .dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1vw;
+    width: 100%;
+    margin: 2vh 0;
+}
+
+#sms-reports .card {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1vw;
+    background: #fff;
+    padding: 1.5vh 1vw;
+    border-radius: 0.6vw;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    min-height: 12vh;
+    width: 100%;
+}
+
+#sms-reports .card img {
+    width: 2.5vw;
+    height: 2.5vw;
+    flex-shrink: 0;
+    min-width: 30px;
+    min-height: 30px;
+}
+
+#sms-reports .card-content {
+    text-align: left;
+    flex: 1;
+}
+
+#sms-reports .card h3 {
+    font-size: 1vw;
+    color: #555;
+    margin: 0 0 0.3vh;
+}
+
+#sms-reports .card p {
+    font-size: 1.4vw;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 0;
+}
+
+/* Filters Container */
+#sms-reports .filters-container {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 100%;
+    margin: 20px 0;
+}
+
+#sms-reports .filters-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+#sms-reports .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+#sms-reports .filter-group label {
+    font-weight: bold;
+    margin-right: 8px;
+    white-space: nowrap;
+    font-size: 0.9vw;
+}
+
+#sms-reports select,
+#sms-reports input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9vw;
+    min-width: 120px;
+}
+
+#sms-reports button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9vw;
+    white-space: nowrap;
+}
+
+/* Table Container */
+#sms-reports .table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    width: 100%;
+}
+
+#deliveryReportsTable {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#deliveryReportsTable table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; /* Ensure table doesn't get too narrow */
+}
+
+#deliveryReportsTable th {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+    background: #f8f9fa;
+    font-size: 0.9vw;
+    white-space: nowrap;
+}
+
+#deliveryReportsTable td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 0.85vw;
+    vertical-align: top;
+}
+
+/* Make specific columns more compact */
+#deliveryReportsTable th:nth-child(1),
+#deliveryReportsTable td:nth-child(1) { 
+    width: 12%; /* Time */
+    min-width: 120px;
+}
+
+#deliveryReportsTable th:nth-child(2),
+#deliveryReportsTable td:nth-child(2) { 
+    width: 12%; /* Guardian */
+    min-width: 120px;
+}
+
+#deliveryReportsTable th:nth-child(3),
+#deliveryReportsTable td:nth-child(3) { 
+    width: 10%; /* Student */
+    min-width: 100px;
+}
+
+#deliveryReportsTable th:nth-child(4),
+#deliveryReportsTable td:nth-child(4) { 
+    width: 10%; /* Phone */
+    min-width: 100px;
+}
+
+#deliveryReportsTable th:nth-child(5),
+#deliveryReportsTable td:nth-child(5) { 
+    width: 8%; /* Grade/Stream */
+    min-width: 80px;
+}
+
+#deliveryReportsTable th:nth-child(6),
+#deliveryReportsTable td:nth-child(6) { 
+    width: 25%; /* Message */
+    min-width: 150px;
+}
+
+#deliveryReportsTable th:nth-child(7),
+#deliveryReportsTable td:nth-child(7) { 
+    width: 8%; /* Status */
+    min-width: 80px;
+}
+
+#deliveryReportsTable th:nth-child(8),
+#deliveryReportsTable td:nth-child(8) { 
+    width: 15%; /* Cause */
+    min-width: 100px;
+}
+
+/* Status badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7vw;
+    font-weight: bold;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Pagination */
+
+/* SMS Reports Pagination - Compact Horizontal Layout */
+#deliveryReportsPagination {
+    padding: 8px 10px;
+    border-top: 1px solid #dee2e6;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px; /* Reduced gap */
+    flex-wrap: nowrap;
+    overflow-x:none;
+    white-space: nowrap;
+    width: 100%;
+    min-height: 40px; /* Reduced height */
+}
+
+#deliveryReportsPagination button {
+    padding: 2px 6px; /* More compact padding */
+    margin: 0;
+    border: 1px solid #ddd;
+    background: white;
+    color: #007bff;
+    border-radius: 2px; /* Smaller radius */
+    cursor: pointer;
+    font-size: 10px; /* Smaller font */
+    max-width: 10vw; /* Smaller minimum width */
+    height: 20px; /* Smaller height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+#deliveryReportsPagination button:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+#deliveryReportsPagination button:disabled {
+    background: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+    border-color: #dee2e6;
+}
+
+#deliveryReportsPagination button.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+#deliveryReportsPagination .ellipsis {
+    padding: 2px 4px;
+    color: #6c757d;
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+/* Loading indicator */
+#loadingIndicator {
+    text-align: center;
+    padding: 40px;
+    display: none;
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #deliveryReportsPagination {
+        gap: 2px;
+        padding: 8px 5px;
+    }
+    
+    #deliveryReportsPagination button {
+        padding: 3px 6px;
+        font-size: 10px;
+        min-width: 24px;
+        height: 22px;
+    }
+}
+@media (max-width: 1024px) {
+    #sms-reports {
+        width: 85vw;
+        max-width: 85vw;
+    }
+    
+    #sms-reports .dashboard-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    #sms-reports .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    #sms-reports .filter-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 768px) {
+    #sms-reports {
+        width: 95vw;
+        max-width: 95vw;
+        padding: 10px;
+    }
+    
+    #sms-reports .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    #deliveryReportsTable {
+        font-size: 12px;
+    }
+}
+/* ===== SMS REPORTS INFORMATION PANEL ===== */
+#smsReportsInfo {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border: 1px solid #90caf9;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+}
+
+#smsReportsInfo h3 {
+    color: #1565c0;
+    margin-bottom: 15px;
+    font-size: 1.2vw;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#smsReportsInfo h3::before {
+    content: "ℹ️";
+    font-size: 1.4vw;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.info-item {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #2196f3;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.info-item.critical {
+    border-left-color: #f44336;
+}
+
+.info-item.warning {
+    border-left-color: #ff9800;
+}
+
+.info-item.success {
+    border-left-color: #4caf50;
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.status-badge-info {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8vw;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.status-badge-info.undelivered {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.status-badge-info.route {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.status-badge-info.invalid {
+    background: #fce4ec;
+    color: #ad1457;
+}
+
+.status-badge-info.blacklisted {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.status-badge-info.delivered {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.status-badge-info.sent {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.info-description {
+    font-size: 0.9vw;
+    color: #555;
+    line-height: 1.4;
+}
+
+.info-solution {
+    margin-top: 8px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 0.85vw;
+    color: #666;
+    border-left: 3px solid #4caf50;
+}
+
+.info-solution::before {
+    content: "💡 ";
+    font-weight: bold;
+}
+
+/* Toggle button for info panel */
+.info-toggle {
+    background: #2196f3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9vw;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.info-toggle:hover {
+    background: #1976d2;
+    transform: translateY(-1px);
+}
+
+.info-toggle.collapsed::after {
+    content: "▶";
+    font-size: 0.8vw;
+}
+
+.info-toggle.expanded::after {
+    content: "▼";
+    font-size: 0.8vw;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #smsReportsInfo h3 {
+        font-size: 16px;
+    }
+    
+    .info-description {
+        font-size: 14px;
+    }
+    
+    .info-solution {
+        font-size: 13px;
+    }
+    
+    .info-toggle {
+        font-size: 14px;
+    }
+}
+/* ----- Responsive Adjustments ----- */
+
+/* Tablet & below */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 180px;
+    flex: 0 0 180px;
+  }
+  header {
+    width: calc(100% - 180px);
+  }
+}
+
+/* Mobile view */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex: none;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .sidebar ul {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .sidebar ul li {
+    padding: 10px 15px;
+  }
+
+  header {
+    width: 100%;
+    margin: 0;
+    position: relative;
+    box-shadow: none;
+  }
+
+  .main-content {
+    padding: 10px;
+    margin-top: 0;
+    height: auto;
+    padding-right: 0;
+  }
+
+  /* Tables: allow horizontal scroll */
+  #contactsTable table,
+  #pupilsTable table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Dashboard cards: fewer columns */
+  .dashboard-cards {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 480px) {
+  .card {
+    padding: 20px 15px;
+  }
+
+  #contacts-toolbar input[type="text"] {
+    min-width: unset;
+    width: 100%;
+  }
+
+  #contacts-toolbar select {
+    width: 100%;
+  }
+
+  #addContactBtn {
+    width: 100%;
+  }
+}
+
+</style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <img src="img/St.Ann Logo.jpeg" class="logo-icon">
+    <h3 style="color:whitesmoke;margin-bottom: 30px;">St.Ann Primary School</h3>
+    
+    <ul>
+      <li onclick="showSection('dashboard')"><img src="img/dashboard.png" style="width: 1.6vw; margin-bottom: -0.7vh; margin-right: 0.35vw;">Dashboard</li>
+      <li onclick="showSection('messages')"><img src="img/icons8-message-64.png" style="width: 1.6vw; margin-bottom: -0.7vh; margin-right: 0.35vw;">Messaging</li>
+      <li onclick="showSection('sms-reports')"><img src="img/icons8-reports-100.png" style="width: 1.6vw; margin-bottom: -0.7vh; margin-right: 0.35vw;">SMS Reports</li>
+      <li onclick="showSection('contacts')"><img src="img/users.png" style="width: 1.6vw; margin-bottom: -0.7vh; margin-right: 0.35vw;">Contacts</li>
+      <li onclick="showSection('pupils')"><img src="img/icons8-children-100.png" style="width: 1.6vw; margin-bottom: -0.7vh; margin-right: 0.35vw;">Pupils</li>
+      <li onclick="showSection('reports')"><img src="img/icons8-report-100.png" style="width: 1.6vw; margin-bottom: -0.7vh; margin-right: 0.35vw;">Reports</li>
+      <li><a href="logout.php" style="text-decoration: none;color: inherit;"><img src="img/icons8-logout-64.png" style="width: 1.6vw; margin-bottom: -0.7vh; margin-right: 0.35vw;">Logout</a></li>
+    </ul>
+  </div>
+
+   
+  <div class="main-content" id="main-content">
+    <header >
+      
+      <h1 >School SMS System</h1>
+      <h1 id="welcomeUser" >Welcome</h1>
+    </header>  
+    <!-- Dashboard Section -->
+    <div class="content-area">
+      <section id="dashboard" class="section active">
+      
+        <h1>Dashboard</h1>
+        <div class="dashboard-cards">
+          <div class="card">
+            <img src="img/icons8-chat-message-sent-100.png" alt="Messages Sent" class="card-icon">
+            <div class="card-content">
+              <h3>Messages Sent</h3>
+              <p id="messages-count">Loading...</p>
+            </div>
+          </div>
+          <div class="card">
+            <img src="img/icons8-students-100.png" alt="Students" class="card-icon">
+            <div class="card-content">
+              <h3>Total Students</h3>
+              <p id="students-count">Loading...</p>
+            </div>
+          </div>
+          <div class="card">
+            <img src="img/icons8-guardian-100.png" alt="Guardians" class="card-icon">
+            <div class="card-content">
+              <h3>Total Guardians</h3>
+              <p id="guardians-count">Loading...</p>
+            </div>
+          </div>
+          <div class="card">
+            <img src="img/icons8-classroom-100 (1).png" alt="Active Grades" class="card-icon">
+            <div class="card-content">
+              <h3>Active Grades</h3>
+              <p id="grades-count">Loading...</p>
+            </div>
+          </div>
+        </div>
+        <!-- Recent Activity Section -->
+        <div class="recent-activity">
+          <h2>Recent Activity</h2>
+          <ul id="activity-list">
+          <!-- Activities will be inserted here dynamically -->
+          </ul>
+        </div>
+      </section>
+
+      <!-- Messages Section -->
+      <!-- Messages Section -->
+<section id="messages" class="section">
+  <h1>Messaging</h1>
+  
+  <!-- Toggle between single parent and bulk messaging -->
+  <div style="margin-bottom: 20px;">
+    <label>
+      <input type="radio" name="messageType" value="single" checked onclick="toggleMessageType('single')">
+      Send to Single Parent
+    </label>
+    <label style="margin-left: 20px;">
+      <input type="radio" name="messageType" value="bulk" onclick="toggleMessageType('bulk')">
+      Send to Multiple Parents
+    </label>
+  </div>
+
+  <!-- Single Parent Messaging -->
+  <!-- Single Parent Messaging -->
+<div id="singleParentSection">
+    <label for="studentSearch">Search Student</label>
+    <div class="search-container">
+        <input type="text" id="studentSearch" placeholder="Type student name (e.g. John Doe)...">
+    </div>
+    <div id="studentSearchSuggestions" class="suggestions" style="display: none;"></div>
+    
+    <div id="selectedStudentInfo" style="display: none; background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0;">
+        <strong>Selected Student:</strong>
+        <span id="selectedStudentName"></span> 
+        (<span id="selectedStudentClass"></span>)
+        <br>
+        <strong>Guardian:</strong>
+        <span id="selectedGuardianName"></span>
+        (<span id="selectedGuardianPhone"></span>)
+    </div>
+</div>
+
+  <!-- Bulk Messaging -->
+  <div id="bulkMessageSection" style="display: none;">
+    <label for="grade">Select Grade</label>
+    <select id="grade" name="grade_level">
+      <option value="" disabled selected>Select a grade</option>
+      <option value="all">All Classes</option>
+      <option value="PG">PG</option>
+      <option value="PP1">PP1</option>
+      <option value="PP2">PP2</option>
+      <option value="Test">Test</option>
+      <option value="1">Grade 1</option>
+      <option value="2">Grade 2</option>
+      <option value="3">Grade 3</option>
+      <option value="4">Grade 4</option>
+      <option value="5">Grade 5</option>
+      <option value="6">Grade 6</option>
+      <option value="7">Grade 7</option>
+      <option value="8">Grade 8</option>
+      <option value="9">Grade 9</option>
+    </select>
+
+    <label for="stream">Select Stream</label>
+    <select id="stream" name="stream">
+      <option value="" disabled selected>Select a stream</option>
+      <option value="all">All Streams</option>
+      <option value="North">North</option>
+      <option value="South">South</option>
+      <option value="East">East</option>
+      <option value="West">West</option>
+    </select>
+
+    <label for="BoardingStatus" name="boarding_status">Select Boarding Status</label>
+    <select id="BoardingStatus">
+      <option value="" disabled selected>Select a boarding status</option>
+      <option value="all">All Statuses</option>
+      <option value="Boarding">Boarding</option>
+      <option value="Day">Day</option>
+    </select>
+  </div>
+
+  <label for="message">Compose Message</label>
+  <textarea id="message" placeholder="Type your message..." name="content"></textarea>
+
+  <!-- SMS Length & Cost Calculator -->
+<div id="smsCalculator" style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 10px;">
+        <div>
+            <strong>Message Length:</strong>
+            <span id="charCount">0</span> characters
+        </div>
+        <div>
+            <strong>SMS Segments:</strong>
+            <span id="smsSegments">0</span>
+        </div>
+        <div>
+            <strong>Encoding:</strong>
+            <span id="encodingType">GSM-7</span>
+        </div>
+        <div>
+            <strong>Estimated Cost:</strong>
+            <span id="estimatedCost">SMS 0.00</span>
+        </div>
+    </div>
+    <div style="font-size: 12px; color: #666; background: white; padding: 8px; border-radius: 4px;">
+        <strong>Pricing Info:</strong> GSM-7 (160 chars/SMS), Unicode (70 chars/SMS) - Rate: KES 1.00 per SMS segment
+    </div>
+</div>
+  
+  <button id="sendMessageBtn">Send Message</button>
+  <p id="statusMsg" style="margin-top:10px; font-weight:bold;"></p>
+</section>
+  
+      <!-- Contacts Section -->
+      <section id="contacts" class="section">
+        <h1>Contacts</h1>
+       
+
+   
+        <!-- Guardian quick lookup (staff) -->
+        <div id="guardianSearchSection" style="margin-bottom:12px;">
+          
+          <div id="contacts-toolbar">
+            <input id="guardianSearchInput" type="text" placeholder="Type student name (e.g. John Doe)..." style="width:100%; padding:10px; margin-top:6px; border:1px solid #ccc; border-radius:6px; font-size:14px;">
+
+            <select id="filterGrade">
+              <option value="">All Grades</option>
+              <option value="PG">PG</option>
+              <option value="PP1">PP1</option>
+              <option value="PP2">PP2</option>
+              <option value="1">Grade 1</option>
+              <option value="2">Grade 2</option>
+              <option value="3">Grade 3</option>
+              <option value="4">Grade 4</option>
+              <option value="5">Grade 5</option>
+              <option value="6">Grade 6</option>
+              <option value="7">Grade 7</option>
+              <option value="8">Grade 8</option>
+              <option value="9">Grade 9</option>
+            </select>
+
+            <select id="filterStream">
+              <option value="">All Streams</option>
+              <option value="North">North</option>
+              <option value="South">South</option>
+              <option value="East">East</option>
+              <option value="West">West</option>
+            </select>
+
+            <select id="filterBoarding">
+              <option value="">All Students</option>
+              <option value="Day">Day</option>
+              <option value="Boarding">Boarding</option>
+            </select>
+            <button id="addContactBtn" type="button">+ Add Contact</button>
+          </div>
+          <div id="guardianSearchResults" style="
+            margin-top:10px; 
+            border:1px solid #ddd; 
+            border-radius:6px; 
+            max-height:220px; 
+            overflow-y:auto; 
+            box-shadow:0 4px 8px rgba(0,0,0,0.08);">
+          </div>
+        </div>
+
+        <div id="contacts-filters" style="margin-bottom:12px; display:flex; gap:10px; flex-wrap:wrap;">
+          
+        </div>
+
+    
+   
+   
+        <div id="contactsTable"></div>
+    
+        
+      </section>
+   
+   
+   
+      <!-- Modal overlay -->
+      <div id="addContactModal" class="modal" aria-hidden="true" role="dialog">
+        <div class="modal-content" role="document" aria-modal="true">
+      
+          <button id="closeModal" class="close-btn" type="button" aria-label="Close modal">&times;</button>
+   
+   
+          <h2>Add Guardian Contact</h2>
+          <form id="addContactForm">
+            <label for="guardian_name">Guardian Name</label>
+            <input type="text" id="guardian_name" name="guardian_name" required>
+            <label for="phone_number">Phone Number</label>
+            <input type="text" id="phone_number" name="phone_number" required>
+            <label for="student_search">Student</label>
+            <input type="text" id="student_search" name="student_search" autocomplete="off" placeholder="Type student name...">
+            <div id="studentSuggestions" class="suggestions" aria-hidden="true"></div>
+            <input type="hidden" id="student_id" name="student_id" required>
+            <button type="submit">Save Contact</button>
+          </form>
+        </div>
+      </div>
+   
+      <div id="editContactModal" class="modal">
+        <div class="modal-content">
+          <button class="close-btn" onclick="document.getElementById('editContactModal').style.display='none'">×</button>
+          <h2>Edit Guardian</h2>
+          <form id="editContactForm">
+            <input type="hidden" name="id" id="edit_guardian_id">
+   
+            <label>Guardian Name</label>
+            <input type="text" name="guardian_name" id="edit_guardian_name" required>
+   
+            <label>Phone Number</label>
+            <input type="text" name="phone_number" id="edit_phone_number" required>
+    
+            <label>Student</label>
+            <input type="text" id="edit_student_name" readonly>
+    
+            <button type="submit">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    
+      <div id="searchContactModal" class="modal">
+        <div class="modal-content">
+          <span class="close" id="closeSearchModal">&times;</span>
+          <h2>Search Student Contact</h2>
+      
+          <form id="searchContactForm">
+            <label for="search_student">Student Name:</label>
+            <input type="text" id="search_student" name="search_student" placeholder="Enter student name..." autocomplete="off" required>
+            <div id="searchSuggestions" class="suggestions-box"></div>
+          </form>
+   
+          <div id="searchResults" style="margin-top:15px;">
+          <!-- Guardian contact will appear here -->
+          </div>
+        </div>
+      </div>
+  
+   
+   
+      <!-- Pupils Section -->
+      <!-- Pupils Section -->
+      <section id="pupils" class="section">
+        <h1>Pupils</h1>
+
+        <!-- Search + Filters -->
+        <div style="margin: 15px 0;">
+          <div id="pupils-filters">
+            <div class="filter-group">
+            <!-- Search box -->
+            <input type="text" id="searchInput" placeholder="Search pupils...">
+            <!-- Grade filter -->
+            <select id="gradeFilter">
+              <option value="">All Grades</option>
+              <option value="PG">PG</option>
+              <option value="PP1">PP1</option>
+              <option value="PP2">PP2</option>
+              <option value="1">Grade 1</option>
+              <option value="2">Grade 2</option>
+              <option value="3">Grade 3</option>
+              <option value="4">Grade 4</option>
+              <option value="5">Grade 5</option>
+              <option value="6">Grade 6</option>
+              <option value="7">Grade 7</option>
+              <option value="8">Grade 8</option>
+              <option value="9">Grade 9</option>
+            </select>
+
+            <select id="streamFilter">
+              <option value="">All Streams</option>
+              <option value="East">East</option>
+              <option value="West">West</option>
+              <option value="North">North</option>
+              <option value="South">South</option>
+            </select>
+
+              <select id="boardingFilter">
+                <option value="">All Boarding</option>
+                <option value="Day">Day</option>
+                <option value="Boarding">Boarding</option>
+              </select>
+            </div>
+            <!-- Add Student Button -->
+            <button id="addStudentBtn" type="button">+ Add Student</button>
+          </div>
+
+          <!-- Pupils Table -->
+          <div id="pupilsTable">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Admission No.</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Grade</th>
+                  <th>Stream</th>
+                  <th>Boarding Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="pupilsTableBody">
+              <!-- Rows will be loaded here via JS -->
+              </tbody>
+            </table>
+          </div>
+ 
+           <!-- Pagination -->
+          <div class="pagination" id="pupilsPagination"></div>
+        </div>
+      </section>
+ 
+      <!-- Reports Section -->
+      <section id="reports" class="section">
+        <h1>Contact Issues Report</h1>
+ 
+        <!-- Errors in Phone Numbers -->
+        <div class="report-card">
+          <h2>Invalid Phone Numbers</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Pupil Name</th>
+                <th>Guardian Name</th>
+                <th>Phone Number</th>
+                <th>Error Type</th>
+              </tr>
+            </thead>
+            <tbody id="invalidPhones"> 
+              <!-- Example row -->
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <!-- Missing Guardian Contacts -->
+        <div class="report-card">
+          <h2>Students Without Guardian Contacts</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>          
+                <th>Grade</th>
+                <th>Stream</th>
+              </tr>
+            </thead>
+            <tbody id="missingContacts">
+              <!-- Example row -->
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SMS Delivery Reports Section -->
+<!-- SMS Delivery Reports Section -->
+<section id="sms-reports" class="section">
+    <h1>SMS Delivery Reports</h1>
+    
+    <!-- Summary Cards -->
+    <div class="dashboard-cards">
+        <div class="card">
+            <img src="img/icons8-letter-100.png" alt="Total Messages" class="card-icon">
+            <div class="card-content">
+                <h3>Total</h3>
+                <p id="total-messages-count">0</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="img/icons8-delivered-mail-100.png" alt="Delivered" class="card-icon">
+            <div class="card-content">
+                <h3>Delivered</h3>
+                <p id="delivered-count">0</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="img/icons8-mail-by-timer-100.png" alt="Notsent" class="card-icon">
+            <div class="card-content">
+                <h3>Not Sent</h3>
+                <p id="notsent-count">0</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="img/icons8-mail-error-100.png" alt="Failed" class="card-icon">
+            <div class="card-content">
+                <h3>Failed</h3>
+                <p id="failed-count">0</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="img/icons8-send-100.png" alt="Submitted" class="card-icon">
+            <div class="card-content">
+                <h3>Submitted</h3>
+                <p id="submitted-count">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-container">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label>Status:</label>
+                <select id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="DELIVERED">Delivered</option>
+                    <option value="SUBMITTED">Submitted</option>
+                    <option value="FAILED">Failed</option>
+                    <option value="SENT">Sent</option>
+                    <option value="NOTSENT">Not Sent</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Grade:</label>
+                <select id="gradeReportFilter">
+                    <option value="">All Grades</option>
+                    <option value="PG">PG</option>
+                    <option value="PP1">PP1</option>
+                    <option value="PP2">PP2</option>
+                    <option value="1">Grade 1</option>
+                    <option value="2">Grade 2</option>
+                    <option value="3">Grade 3</option>
+                    <option value="4">Grade 4</option>
+                    <option value="5">Grade 5</option>
+                    <option value="6">Grade 6</option>
+                    <option value="7">Grade 7</option>
+                    <option value="8">Grade 8</option>
+                    <option value="9">Grade 9</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Date:</label>
+                <input type="date" id="dateFilter">
+            </div>
+            <button onclick="toggleInfoPanel()" style="background: #ff9800; color: white;">
+              📋 Status Info
+            </button>
+            <button onclick="loadDeliveryReports()" style="background: #3498db; color: white;">
+                🔄 Refresh
+            </button>
+            <button onclick="exportToCSV()" style="background: #27ae60; color: white;">
+                📊 Export CSV
+            </button>
+        </div>
+    </div>
+
+    <!-- SMS Reports Information Panel -->
+<div id="smsReportsInfo" style="display: none;">
+    <button class="info-toggle expanded" onclick="toggleInfoPanel()">
+        <span>📋 Message Status Information</span>
+    </button>
+    
+    <div class="info-content">
+        <h3>Understanding SMS Delivery Status</h3>
+        <div class="info-grid">
+            <!-- Undelivered -->
+            <div class="info-item critical">
+                <div class="info-header">
+                    <span class="status-badge-info undelivered">Undelivered</span>
+                </div>
+                <div class="info-description">
+                    The recipient's phone might be switched off or out of service range.
+                </div>
+                <div class="info-solution">
+                    Usually resolves automatically when phone is back in network coverage.
+                </div>
+            </div>
+
+            <!-- Route Not Defined -->
+            <div class="info-item warning">
+                <div class="info-header">
+                    <span class="status-badge-info route">Route Not Defined</span>
+                </div>
+                <div class="info-description">
+                    The recipient is using a non-Safaricom carrier (Airtel, Telkom, etc.).
+                </div>
+                <div class="info-solution">
+                    Messages to other networks may have limited delivery guarantees.
+                </div>
+            </div>
+
+            <!-- Invalid User -->
+            <div class="info-item critical">
+                <div class="info-header">
+                    <span class="status-badge-info invalid">Invalid User</span>
+                </div>
+                <div class="info-description">
+                    Phone number either has incorrect format or no user exists with that number.
+                </div>
+                <div class="info-solution">
+                    Verify the phone number format (should be 2547XXXXXXXX) and contact details.
+                </div>
+            </div>
+
+            <!-- User Blacklisted Sender ID -->
+            <div class="info-item warning">
+                <div class="info-header">
+                    <span class="status-badge-info blacklisted">Blacklisted Sender</span>
+                </div>
+                <div class="info-description">
+                    User has blocked promotional messages from STANNSCH sender ID.
+                </div>
+                <div class="info-solution">
+                    Ask recipient to dial *456*9*5#, select "Activate by Sender Name," and enter "STANNSCH"
+                </div>
+            </div>
+
+            <!-- Delivered -->
+            <div class="info-item success">
+                <div class="info-header">
+                    <span class="status-badge-info delivered">Delivered</span>
+                </div>
+                <div class="info-description">
+                    Message successfully delivered to recipient's phone.
+                </div>
+                <div class="info-solution">
+                    Confirmed receipt by the mobile network.
+                </div>
+            </div>
+
+            <!-- Sent -->
+            <div class="info-item">
+                <div class="info-header">
+                    <span class="status-badge-info sent">Sent/Submitted</span>
+                </div>
+                <div class="info-description">
+                    Message accepted by SMS gateway and queued for delivery.
+                </div>
+                <div class="info-solution">
+                    Awaiting delivery confirmation from mobile network.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Messages Table -->
+    <div class="table-container">
+        <div id="deliveryReportsTable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Guardian</th>
+                        <th>Student</th>
+                        <th>Phone</th>
+                        <th>Grade/Stream</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Cause</th>
+                    </tr>
+                </thead>
+                <tbody id="deliveryReportsBody">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        <div id="deliveryReportsPagination">
+            <!-- Pagination will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loadingIndicator">
+        <div style="color: #3498db; font-size: 16px;">Loading delivery reports...</div>
+    </div>
+</section>
+ 
+      <!-- Edit Pupil Modal -->
+      <div id="editPupilModal" class="modal">
+        <div class="modal-content">
+          <button class="close-btn" onclick="document.getElementById('editPupilModal').style.display='none'">×</button>
+          <h2>Edit Pupil</h2>
+          <form id="editPupilForm">
+            <input type="hidden" id="edit_pupil_id">
+   
+            <label>First Name</label>
+            <input type="text" id="edit_pupil_first" required>
+  
+            <label>Last Name</label>
+            <input type="text" id="edit_pupil_last" required>
+ 
+            <label>Grade</label>
+            <select id="edit_pupil_grade" required>
+              <option value="PG">PG</option>
+              <option value="PP1">PP1</option>
+              <option value="PP2">PP2</option>
+              <option value="1">Grade 1</option>
+              <option value="2">Grade 2</option>
+              <option value="3">Grade 3</option>
+              <option value="4">Grade 4</option>
+              <option value="5">Grade 5</option>
+              <option value="6">Grade 6</option>
+              <option value="7">Grade 7</option>
+              <option value="8">Grade 8</option>
+              <option value="9">Grade 9</option>
+            </select>
+  
+            <label>Stream</label>
+            <select id="edit_pupil_stream" required>
+              <option value="North">North</option>
+              <option value="South">South</option>
+              <option value="East">East</option>
+              <option value="West">West</option>
+            </select>
+    
+            <label>Boarding Status</label>
+            <select id="edit_pupil_boarding" required>
+              <option value="Boarding">Boarding</option>
+              <option value="Day">Day</option>
+            </select>
+  
+            <button type="submit">Save Changes</button>
+          </form>
+        </div>
+      </div>
+
+      
+ 
+      <!-- Add Student Modal -->
+      <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+          <button class="close-btn" id="closeStudentModal">&times;</button>
+          <h2>Add Student</h2>
+          <form id="addStudentForm">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" required>
+    
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" required>
+   
+            <label for="admission_number">Admission Number</label>
+            <input type="text" id="admission_number" name="admission_number" >
+    
+            <label for="grade_level">Grade</label>
+            <select id="grade_level" name="grade_level" required>
+              <option value="">Select Grade</option>
+              <option value="PG">PG</option>
+              <option value="PP1">PP1</option>
+              <option value="PP2">PP2</option>
+              <option value="1">Grade 1</option>
+              <option value="2">Grade 2</option>
+              <option value="3">Grade 3</option>
+              <option value="5">Grade 5</option>
+              <option value="6">Grade 6</option>
+              <option value="7">Grade 7</option>
+              <option value="8">Grade 8</option>
+              <option value="9">Grade 9</option>
+            </select>
+  
+           <label for="stream">Stream</label>
+            <select id="stream" name="stream" required>
+              <option value="">Select Stream</option>
+              <option value="North">North</option>
+              <option value="South">South</option>
+              <option value="East">East</option>
+              <option value="West">West</option>
+            </select>
+  
+            <label for="boarding_status">Boarding Status</label>
+            <select id="boarding_status" name="boarding_status" required>
+              <option value="">Select Status</option>
+              <option value="Boarding">Boarding</option>
+              <option value="Day">Day</option>
+            </select>
+  
+            <button type="submit">Save Student</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+     
+  <footer>
+    <img src="/images/logo.jpg" alt="Footer Logo">
+    <p>&copy; Rand Developers @2025 School SMS System<br>Contact us@randdevelopers02@gmail.com<br>call:0798729190/0705964700</p>
+  </footer>
+
+  <script>
+    fetch("dashboard_data.php")
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          document.getElementById("messages-count").innerText = data.data.messages;
+          document.getElementById("students-count").innerText = data.data.students;
+          document.getElementById("guardians-count").innerText = data.data.guardians;
+          document.getElementById("grades-count").innerText = data.data.grades;
+        } else {
+          console.error("Error:", data.message);
+        }
+      })
+      .catch(err => console.error("Fetch error:", err));
+  </script>
+
+  <script>
+function showSection(sectionId) {
+    // Hide all sections
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+    // Show the clicked section
+    document.getElementById(sectionId).classList.add('active');
+    
+    // Handle specific section behaviors
+    if (sectionId === 'sms-reports') {
+        // Load delivery reports
+        loadDeliveryReports();
+        
+        // Show info panel by default (set to 'none' if you want it hidden)
+        setTimeout(() => {
+            document.getElementById('smsReportsInfo').style.display = 'block';
+        }, 100);
+    } else {
+        // Hide info panel when switching to other sections
+        document.getElementById('smsReportsInfo').style.display = 'none';
+    }
+}
+  </script>
+
+  <script>
+  // Check if the user is logged in
+    fetch("session_check.php")
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "ok") {
+        console.log("✅ Logged in as", data.username);
+        // You can also display username on the dashboard if you like
+        document.getElementById("welcomeUser").innerText = "Welcome " + data.username;
+      } else {
+        alert("⚠️ Please log in first.");
+        window.location.href = "login.html";
+      }
+    })
+    .catch(err => console.error("Session check failed:", err));
+
+    document.getElementById("sendMessageBtn").addEventListener("click", function() {
+      const grade = document.getElementById("grade").value;
+      const stream = document.getElementById("stream").value;
+      const boarding_status = document.getElementById("BoardingStatus").value;
+       const content = document.getElementById("message").value;
+
+      // simple validation
+      if (!grade || !stream || !boarding_status || !content.trim()) {
+        document.getElementById("statusMsg").innerText = "⚠️ Please fill all fields.";
+        document.getElementById("statusMsg").style.color = "red";
+        return;
+      }
+
+      fetch("messages.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          grade_level: grade,
+          stream: stream,
+          boarding_status: boarding_status,
+          content: content
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          document.getElementById("statusMsg").innerText = "✅ Message saved successfully!";
+          document.getElementById("statusMsg").style.color = "green";
+  
+          // reset form
+          document.getElementById("grade").value = "";
+          document.getElementById("stream").value = "";
+          document.getElementById("BoardingStatus").value = "";
+          document.getElementById("message").value = "";
+        } else {
+          document.getElementById("statusMsg").innerText = "❌ " + data.message;
+          document.getElementById("statusMsg").style.color = "red";
+        }
+      })
+      .catch(err => {
+        console.error("Error:", err);
+        document.getElementById("statusMsg").innerText = "❌ Something went wrong!";
+        document.getElementById("statusMsg").style.color = "red";
+      });
+    });
+  </script>
+  <!-- Messaging Script -->
+<script>
+// Student search functionality for single parent messaging - Improved version
+let selectedStudent = null;
+let searchTimeout = null;
+
+function toggleMessageType(type) {
+    if (type === 'single') {
+        document.getElementById('singleParentSection').style.display = 'block';
+        document.getElementById('bulkMessageSection').style.display = 'none';
+        // Clear bulk form fields
+        document.getElementById('grade').value = '';
+        document.getElementById('stream').value = '';
+        document.getElementById('BoardingStatus').value = '';
+    } else {
+        document.getElementById('singleParentSection').style.display = 'none';
+        document.getElementById('bulkMessageSection').style.display = 'block';
+        // Clear single parent fields
+        selectedStudent = null;
+        document.getElementById('studentSearch').value = '';
+        document.getElementById('selectedStudentInfo').style.display = 'none';
+    }
+}
+
+// Improved student search autocomplete with debouncing
+document.getElementById('studentSearch').addEventListener('input', function(e) {
+    const query = e.target.value.trim();
+    const suggestions = document.getElementById('studentSearchSuggestions');
+    
+    // Clear previous timeout
+    clearTimeout(searchTimeout);
+    
+    if (query.length < 2) {
+        suggestions.style.display = 'none';
+        return;
+    }
+    
+    // Use debouncing like in contacts.js (300ms delay)
+    searchTimeout = setTimeout(async () => {
+        try {
+            // Use FormData like in contacts.js to match your search_students.php
+            const formData = new FormData();
+            formData.append('query', query);
+            
+            const res = await fetch('search_students.php', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            
+            suggestions.innerHTML = '';
+            
+            if (data.status === 'success' && data.students.length > 0) {
+                data.students.forEach(student => {
+                    const div = document.createElement('div');
+                    div.textContent = `${student.first_name} ${student.last_name} - ${student.grade_level} ${student.stream}`;
+                    div.setAttribute('data-student-id', student.id);
+                    div.setAttribute('data-student-name', `${student.first_name} ${student.last_name}`);
+                    div.setAttribute('data-student-class', `${student.grade_level} ${student.stream}`);
+                    
+                    div.addEventListener('click', function() {
+                        selectStudent(student.id, `${student.first_name} ${student.last_name}`, `${student.grade_level} ${student.stream}`);
+                    });
+                    
+                    suggestions.appendChild(div);
+                });
+                suggestions.style.display = 'block';
+            } else {
+                suggestions.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error searching students:', error);
+            suggestions.style.display = 'none';
+        }
+    }, 300); // 300ms delay like in contacts.js
+});
+
+// Enhanced selectStudent function that gets both guardian and student details
+async function selectStudent(studentId, studentName, studentClass) {
+    try {
+        // Fetch guardian AND student information
+        const response = await fetch(`get_guardian_info.php?student_id=${studentId}`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            selectedStudent = {
+                id: studentId,
+                name: studentName,
+                class: studentClass,
+                guardianName: data.guardian_name || 'Not assigned',
+                guardianPhone: data.phone_number || 'Not assigned',
+                // Store the actual student details for messaging
+                grade_level: data.student_details?.grade_level,
+                stream: data.student_details?.stream,
+                boarding_status: data.student_details?.boarding_status
+            };
+        } else {
+            selectedStudent = {
+                id: studentId,
+                name: studentName,
+                class: studentClass,
+                guardianName: 'Not assigned',
+                guardianPhone: 'Not assigned'
+            };
+            showStatus("⚠️ No guardian found for this student", "orange");
+        }
+        
+        updateSelectedStudentDisplay();
+        
+    } catch (error) {
+        console.error('Error fetching guardian/student info:', error);
+        selectedStudent = {
+            id: studentId,
+            name: studentName,
+            class: studentClass,
+            guardianName: 'Error loading',
+            guardianPhone: 'Error loading'
+        };
+        updateSelectedStudentDisplay();
+    }
+    
+    document.getElementById('studentSearch').value = studentName;
+    document.getElementById('studentSearchSuggestions').style.display = 'none';
+}
+
+function updateSelectedStudentDisplay() {
+    if (!selectedStudent) return;
+    
+    document.getElementById('selectedStudentName').textContent = selectedStudent.name;
+    document.getElementById('selectedStudentClass').textContent = selectedStudent.class;
+    document.getElementById('selectedGuardianName').textContent = selectedStudent.guardianName;
+    document.getElementById('selectedGuardianPhone').textContent = selectedStudent.guardianPhone;
+    document.getElementById('selectedStudentInfo').style.display = 'block';
+}
+
+// Close suggestions when clicking outside - improved version
+document.addEventListener('click', function(e) {
+    const suggestions = document.getElementById('studentSearchSuggestions');
+    const searchInput = document.getElementById('studentSearch');
+    
+    if (suggestions && !e.target.matches('#studentSearch') && !suggestions.contains(e.target)) {
+        suggestions.style.display = 'none';
+    }
+});
+
+function estimateRecipientCount(grade, stream, boarding_status) {
+    // Simple estimation
+    if (grade === 'all' && stream === 'all' && boarding_status === 'all') {
+        return 'all';
+    }
+    return 'multiple';
+}
+
+function showConfirmation(message, requestData) {
+    const messagePreview = document.getElementById('message').value.substring(0, 100);
+    const fullMessage = document.getElementById('message').value;
+    
+    if (confirm(`${message}\n\nMessage: "${messagePreview}${fullMessage.length > 100 ? '...' : ''}"`)) {
+        sendMessage(requestData);
+    }
+}
+
+function sendMessage(requestData) {
+    showStatus("⏳ Sending message...", "blue");
+    
+    console.log("Sending request data:", requestData);
+    
+    fetch("messages.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData)
+    })
+    .then(res => {
+        // First, check if the response is JSON
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            // If not JSON, get the text and see what's wrong
+            return res.text().then(text => {
+                throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}`);
+            });
+        }
+        return res.json();
+    })
+    .then(data => {
+        console.log("Response from server:", data);
+        
+        if (data.status === "success") {
+            showStatus(`✅ Message sent successfully! (${data.sent} sent, ${data.failed} failed)`, "green");
+            
+            // Reset form
+            document.getElementById("message").value = "";
+            if (requestData.student_id) {
+                // Single message sent
+                selectedStudent = null;
+                document.getElementById('studentSearch').value = '';
+                document.getElementById('selectedStudentInfo').style.display = 'none';
+            } else {
+                // Bulk message sent
+                document.getElementById("grade").value = "";
+                document.getElementById("stream").value = "";
+                document.getElementById("BoardingStatus").value = "";
+            }
+            
+            // Refresh recent activity
+            if (typeof loadRecentActivity === 'function') {
+                setTimeout(loadRecentActivity, 1000);
+            }
+        } else {
+            showStatus("❌ " + (data.message || "Unknown error"), "red");
+        }
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        showStatus("❌ " + err.message, "red");
+    });
+}
+
+function showStatus(message, color) {
+    const statusElement = document.getElementById("statusMsg");
+    statusElement.innerText = message;
+    statusElement.style.color = color;
+}
+
+// Enhanced send message function with better validation
+document.getElementById("sendMessageBtn").addEventListener("click", function() {
+    const messageType = document.querySelector('input[name="messageType"]:checked').value;
+    const content = document.getElementById("message").value.trim();
+    
+    if (!content) {
+        showStatus("⚠️ Please enter a message.", "red");
+        return;
+    }
+    
+    let requestData = {};
+    
+    if (messageType === 'single') {
+        if (!selectedStudent) {
+            showStatus("⚠️ Please select a student.", "red");
+            return;
+        }
+        
+        if (selectedStudent.guardianPhone === 'Not assigned' || selectedStudent.guardianPhone === 'Error loading') {
+            showStatus("❌ Selected student doesn't have a valid guardian contact.", "red");
+            return;
+        }
+
+        // Check if we have the actual student details
+        if (selectedStudent.grade_level && selectedStudent.stream && selectedStudent.boarding_status) {
+            // Use the ACTUAL student details we already fetched
+                requestData = {
+        grade_level: selectedStudent.grade_level,
+        stream: selectedStudent.stream,
+        boarding_status: selectedStudent.boarding_status, 
+        content: content,
+        student_id: selectedStudent.id, // Include student_id
+        phone_number: selectedStudent.guardianPhone // Include phone_number
+    };
+            
+            showConfirmation(`Send message to ${selectedStudent.guardianName} (${selectedStudent.guardianPhone})?`, requestData);
+        } else {
+            // Fallback: use the original approach
+            requestData = {
+                grade_level: 'single',
+                stream: 'single',
+                boarding_status: 'single', 
+                content: content,
+                student_id: selectedStudent.id,
+                phone_number: selectedStudent.guardianPhone
+            };
+            
+            showConfirmation(`Send message to ${selectedStudent.guardianName} (${selectedStudent.guardianPhone})?`, requestData);
+        }
+        
+    } else {
+        const grade = document.getElementById("grade").value;
+        const stream = document.getElementById("stream").value;
+        const boarding_status = document.getElementById("BoardingStatus").value;
+        
+        if (!grade || !stream || !boarding_status) {
+            showStatus("⚠️ Please fill all fields for bulk messaging.", "red");
+            return;
+        }
+        
+        requestData = {
+            grade_level: grade,
+            stream: stream,
+            boarding_status: boarding_status,
+            content: content
+        };
+        
+        const recipientCount = estimateRecipientCount(grade, stream, boarding_status);
+        showConfirmation(`Send message to ${recipientCount} recipients?`, requestData);
+    }
+});
+
+// Enhanced search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const studentSearch = document.getElementById('studentSearch');
+    
+    // Add loading state
+    studentSearch.addEventListener('input', function() {
+        if (this.value.trim().length >= 2) {
+            this.classList.add('loading');
+        } else {
+            this.classList.remove('loading');
+        }
+    });
+    
+    // Clear loading state when suggestions are shown
+    const originalInputHandler = studentSearch.oninput;
+    studentSearch.oninput = function(e) {
+        if (originalInputHandler) originalInputHandler.call(this, e);
+        
+        // Clear loading class when suggestions appear
+        setTimeout(() => {
+            const suggestions = document.getElementById('studentSearchSuggestions');
+            if (suggestions.style.display === 'block') {
+                studentSearch.classList.remove('loading');
+            }
+        }, 350);
+    };
+});
+
+// Initialize with single parent messaging
+document.addEventListener('DOMContentLoaded', function() {
+    toggleMessageType('single');
+});
+  </script>
+  <script>
+    // SMS Length & Cost Calculator
+class SMSCalculator {
+    constructor() {
+        this.gsm7BitChars = new Set([
+            '@', '£', '$', '¥', 'è', 'é', 'ù', 'ì', 'ò', 'Ç', '\\n', 'Ø', 'ø', '\\r', 'Å', 'å',
+            'Δ', '_', 'Φ', 'Γ', 'Λ', 'Ω', 'Π', 'Ψ', 'Σ', 'Θ', 'Ξ', 'Æ', 'æ', 'ß', 'É',
+            ' ', '!', '"', '#', '¤', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?',
+            '¡', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+            'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ä', 'Ö', 'Ñ', 'Ü', '§',
+            '¿', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+            'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ä', 'ö', 'ñ', 'ü', 'à'
+        ]);
+        
+        this.smsRate = 1.00; // KES per SMS segment
+        this.init();
+    }
+
+    init() {
+        const messageTextarea = document.getElementById('message');
+        if (messageTextarea) {
+            messageTextarea.addEventListener('input', this.handleMessageInput.bind(this));
+            // Initial calculation
+            this.calculateSMSInfo(messageTextarea.value);
+        }
+    }
+
+    handleMessageInput(event) {
+        this.calculateSMSInfo(event.target.value);
+    }
+
+    calculateSMSInfo(message) {
+        const charCount = message.length;
+        const encoding = this.detectEncoding(message);
+        const segmentInfo = this.calculateSegments(message, encoding);
+        const cost = this.calculateCost(segmentInfo.segments);
+
+        this.updateDisplay(charCount, segmentInfo, encoding, cost);
+    }
+
+    detectEncoding(message) {
+        for (let char of message) {
+            if (!this.gsm7BitChars.has(char)) {
+                return 'Unicode';
+            }
+        }
+        return 'GSM-7';
+    }
+
+    calculateSegments(message, encoding) {
+        let maxCharsPerSegment, maxCharsPerFirstSegment;
+        
+        if (encoding === 'GSM-7') {
+            maxCharsPerSegment = 160;
+            maxCharsPerFirstSegment = 160;
+        } else {
+            maxCharsPerSegment = 70;
+            maxCharsPerFirstSegment = 70;
+        }
+
+        // Multi-segment message calculation
+        let segments = 1;
+        let remainingChars = message.length;
+        
+        if (remainingChars > maxCharsPerFirstSegment) {
+            segments = 1;
+            remainingChars -= maxCharsPerFirstSegment;
+            
+            // For multi-segment messages, subsequent segments have different limits
+            const maxCharsPerSubsequentSegment = (encoding === 'GSM-7') ? 153 : 67;
+            
+            while (remainingChars > 0) {
+                segments++;
+                remainingChars -= maxCharsPerSubsequentSegment;
+            }
+        }
+
+        return {
+            segments: segments,
+            maxCharsPerSegment: maxCharsPerSegment,
+            encoding: encoding
+        };
+    }
+
+    calculateCost(segments) {
+        return segments * this.smsRate;
+    }
+
+    updateDisplay(charCount, segmentInfo, encoding, cost) {
+        // Update character count
+        const charCountElement = document.getElementById('charCount');
+        charCountElement.textContent = charCount;
+        
+        // Update segments
+        document.getElementById('smsSegments').textContent = segmentInfo.segments;
+        
+        // Update encoding
+        document.getElementById('encodingType').textContent = encoding;
+        
+        // Update cost
+        document.getElementById('estimatedCost').textContent = `KES ${cost.toFixed(2)}`;
+        
+        // Update visual states
+        this.updateVisualStates(charCount, segmentInfo, encoding);
+    }
+
+    updateVisualStates(charCount, segmentInfo, encoding) {
+        const calculator = document.getElementById('smsCalculator');
+        const charCountElement = document.getElementById('charCount');
+        
+        // Remove all states first
+        calculator.classList.remove('warning', 'critical');
+        charCountElement.classList.remove('near-limit', 'over-limit');
+        
+        const maxChars = (encoding === 'GSM-7') ? 160 : 70;
+        
+        if (segmentInfo.segments > 1) {
+            calculator.classList.add('warning');
+            charCountElement.classList.add('over-limit');
+        } else if (charCount > maxChars * 0.8) { // 80% of single segment limit
+            calculator.classList.add('warning');
+            charCountElement.classList.add('near-limit');
+        }
+        
+        if (segmentInfo.segments > 3) {
+            calculator.classList.add('critical');
+        }
+    }
+
+    // Method to get SMS info for sending (you can use this in your send function)
+    getSMSInfo(message) {
+        const encoding = this.detectEncoding(message);
+        const segmentInfo = this.calculateSegments(message, encoding);
+        const cost = this.calculateCost(segmentInfo.segments);
+        
+        return {
+            charCount: message.length,
+            segments: segmentInfo.segments,
+            encoding: encoding,
+            cost: cost,
+            maxCharsPerSegment: segmentInfo.maxCharsPerSegment
+        };
+    }
+}
+
+// Initialize the calculator when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const smsCalculator = new SMSCalculator();
+    
+    // Make it available globally for your send function
+    window.smsCalculator = smsCalculator;
+});
+  </script>
+  <!-- Reports Section: Check Delivery Report -->
+<script>
+// ==================== AUTOMATIC DELIVERY REPORTS ====================
+// (Replaces the manual check button)
+
+let deliveryReportInterval;
+let lastCheckTime = null;
+
+// Initialize automatic delivery reports
+function initAutoDeliveryReports() {
+    console.log("Initializing automatic delivery reports...");
+    
+    // Run immediately on page load
+    runAutoDeliveryReport();
+    
+    // Then run every 5 minutes (300,000 milliseconds)
+    deliveryReportInterval = setInterval(runAutoDeliveryReport, 5 * 60 * 1000);
+    
+    // Update status display
+    updateStatusDisplay("Initialized - Next check in 5 minutes");
+}
+
+// Run delivery report automatically
+function runAutoDeliveryReport() {
+    console.log("🔄 Auto-checking delivery reports...");
+    updateStatusDisplay("Checking delivery reports...");
+    
+    fetch("delivery_report.php")
+        .then(res => res.json())
+        .then(data => {
+            lastCheckTime = new Date();
+            
+            if (data.status === "success") {
+                const updated = data.summary?.successfully_updated || data.updated_rows || 0;
+                const total = data.summary?.total_reports || data.report_count || 0;
+                
+                if (updated > 0) {
+                    // Show success notification
+                    showAutoUpdateNotification(`✅ Auto-updated ${updated} message statuses`);
+                    
+                    // Refresh recent activity to show updated statuses
+                    if (typeof loadRecentActivity === 'function') {
+                        setTimeout(loadRecentActivity, 1000);
+                    }
+                }
+                
+                // Update status display
+                const nextCheck = new Date(Date.now() + 5 * 60 * 1000);
+                updateStatusDisplay(
+                    `Last check: ${formatTime(lastCheckTime)} | Updated: ${updated} messages | Next: ${formatTime(nextCheck)}`
+                );
+                
+                console.log(`Auto-delivery report: ${updated} updates from ${total} reports`);
+            } else {
+                updateStatusDisplay(`Last check: ${formatTime(lastCheckTime)} | Error: ${data.error || 'Unknown error'}`);
+            }
+        })
+        .catch(err => {
+            console.error("Auto-delivery check failed:", err);
+            lastCheckTime = new Date();
+            updateStatusDisplay(`Last check: ${formatTime(lastCheckTime)} | Error: ${err.message}`);
+        });
+}
+
+// Update the status display
+function updateStatusDisplay(message) {
+    const statusElement = document.getElementById('lastCheckStatus');
+    if (statusElement) {
+        statusElement.textContent = message;
+        
+        // Change color based on content
+        if (message.includes('Error')) {
+            statusElement.style.color = '#dc3545'; // Red for errors
+        } else if (message.includes('Updated')) {
+            statusElement.style.color = '#28a745'; // Green for updates
+        } else {
+            statusElement.style.color = '#6c757d'; // Gray for info
+        }
+    }
+}
+
+// Format time for display
+function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+// Show auto-update notification
+function showAutoUpdateNotification(message) {
+    // Remove existing notification if any
+    const existing = document.querySelector('.auto-update-notification');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = 'auto-update-notification';
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 6px;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideInRight 0.3s ease-out;
+        font-size: 14px;
+        font-weight: 500;
+        max-width: 300px;
+    `;
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span>✅</span>
+            <span>${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    }, 4000);
+}
+
+// Add required CSS animations
+const autoReportStyles = document.createElement('style');
+autoReportStyles.textContent = `
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    /* Optional: Add pulsating effect to status when checking */
+    .checking-status {
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
+`;
+document.head.appendChild(autoReportStyles);
+
+// Manual trigger function (in case you want to keep a manual option somewhere)
+function manualCheckDeliveryReports() {
+    console.log("Manual delivery report check triggered");
+    runAutoDeliveryReport();
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Start automatic delivery reports
+    initAutoDeliveryReports();
+    
+    // Optional: Add a small manual trigger somewhere if needed
+    // You can add this to your dashboard or settings section
+    addManualTriggerOption();
+});
+
+// Optional: Add a small manual trigger (hidden by default)
+function addManualTriggerOption() {
+    const manualTrigger = document.createElement('div');
+    manualTrigger.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #007bff;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s;
+    `;
+    manualTrigger.innerHTML = '🔄 Check Now';
+    manualTrigger.title = 'Check delivery reports manually';
+    manualTrigger.addEventListener('click', manualCheckDeliveryReports);
+    manualTrigger.addEventListener('mouseenter', () => manualTrigger.style.opacity = '1');
+    manualTrigger.addEventListener('mouseleave', () => manualTrigger.style.opacity = '0.7');
+    
+    document.body.appendChild(manualTrigger);
+}
+
+// Clean up on page unload
+window.addEventListener('beforeunload', function() {
+    if (deliveryReportInterval) {
+        clearInterval(deliveryReportInterval);
+        console.log("Auto delivery reports stopped");
+    }
+});
+</script>
+<!-- Contacts Section Modal -->
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("addContactModal");
+  const openBtn = document.getElementById("addContactBtn");
+  const closeBtn = document.getElementById("closeModal");
+  const form = document.getElementById("addContactForm");
+  const suggestions = document.getElementById("studentSuggestions");
+  const studentSearch = document.getElementById("student_search");
+  const hiddenStudentId = document.getElementById("student_id");
+
+  // ✅ Open modal
+  openBtn?.addEventListener("click", () => {
+    modal.style.display = "block";
+    modal.setAttribute("aria-hidden", "false");
+    document.getElementById("guardian_name").focus();
+  });
+
+  // ✅ Close helper
+  function closeModal() {
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+    form.reset();
+    hiddenStudentId.value = "";
+    suggestions.innerHTML = "";
+    suggestions.style.display = "none";
+    if (studentSearch) studentSearch.value = "";
+  }
+
+  // Close events
+  closeBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeModal();
+  });
+
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.style.display === "block") {
+      closeModal();
+    }
+  });
+
+  // ✅ Prevent Enter on student search
+  studentSearch?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
+  });
+
+  // ✅ Submit form via AJAX
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("contacts.php", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+
+      if (data.status === "success") {
+        alert("Guardian added successfully!");
+        closeModal();
+
+        // 🔄 Auto refresh contacts list
+        if (typeof loadContacts === "function") {
+          loadContacts();
+        }
+      } else {
+        alert("Error: " + (data.message || "Unknown error"));
+      }
+    } catch (err) {
+      console.error("Request failed", err);
+      alert("Something went wrong. Please try again.");
+    }
+  });
+});
+
+// 🔄 Example loader (replace with your actual fetch for contacts table)
+function loadContacts() {
+  fetch("fetch_contacts.php")
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        const tbody = document.querySelector("#contactsTable tbody");
+        tbody.innerHTML = "";
+        data.contacts.forEach(c => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${c.guardian_name}</td>
+            <td>${c.phone}</td>
+            <td>${c.student_name}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+    })
+    .catch(err => console.error("Error loading contacts", err));
+}
+</script>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Handle Edit Guardian button clicks
+  document.querySelectorAll(".edit-guardian-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+      // Populate modal fields with dataset values
+      document.getElementById("edit_guardian_id").value = this.dataset.id;
+      document.getElementById("edit_guardian_name").value = this.dataset.name;
+      document.getElementById("edit_phone_number").value = this.dataset.phone;
+      document.getElementById("edit_student_name").value = this.dataset.student;
+
+      // Show modal
+      document.getElementById("editContactModal").style.display = "block";
+    });
+  });
+
+
+
+  // Handle Save Changes submit
+  document.getElementById("editContactForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch("contacts.php", {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message);
+
+      if (data.status === "success") {
+        // Update row in table (frontend only)
+        const id = document.getElementById("edit_guardian_id").value;
+        const row = document.querySelector(`#contactsTable tr[data-id='${id}']`);
+        if (row) {
+          row.querySelector(".guardian-name").textContent = document.getElementById("edit_guardian_name").value;
+          row.querySelector(".guardian-phone").textContent = document.getElementById("edit_phone_number").value;
+        }
+
+        // Close modal
+        document.getElementById("editContactModal").style.display = "none";
+      }
+    })
+    .catch(err => {
+      console.error("Error updating guardian:", err);
+      alert("An error occurred while updating the guardian.");
+    });
+  });
+});
+</script>
+
+
+<script>
+// Open Add Student Modal
+document.getElementById('addStudentBtn').addEventListener('click', () => {
+  document.getElementById('addStudentModal').style.display = 'block';
+});
+
+// Close modal
+document.getElementById('closeStudentModal').addEventListener('click', () => {
+  document.getElementById('addStudentModal').style.display = 'none';
+});
+
+// Close modal if clicking outside
+window.addEventListener('click', (e) => {
+  if (e.target === document.getElementById('addStudentModal')) {
+    document.getElementById('addStudentModal').style.display = 'none';
+  }
+});
+
+// Handle Add Student Form submission
+document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+
+  fetch('add_student.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+
+    if (data.status === 'success') {
+      // Close modal and reset form
+      document.getElementById('addStudentModal').style.display = 'none';
+      this.reset();
+
+      // ✅ Refresh pupils table dynamically
+      if (typeof loadPupils === 'function') {
+        loadPupils(1); // reload page 1 of table
+      }
+    }
+  })
+  .catch(err => console.error('Error adding student:', err));
+});
+</script>
+<script>
+function fetchReports() {
+  fetch("report.php")
+    .then(res => res.json())
+    .then(data => {
+      // Invalid Numbers
+      const invalidTable = document.getElementById("invalidPhones");
+      invalidTable.innerHTML = "";
+      data.invalid.forEach(item => {
+        invalidTable.innerHTML += `
+          <tr>
+            <td>${item.student_name}</td>
+            <td>${item.guardian_name}</td>
+            <td>${item.phone_number}</td>
+            <td>${item.issues.join(", ")}</td>
+          </tr>`;
+      });
+
+      // Missing Contacts
+      const missingTable = document.getElementById("missingContacts");
+      missingTable.innerHTML = "";
+      data.missing.forEach(item => {
+        missingTable.innerHTML += `
+          <tr>
+            <td>${item.student_name}</td>
+            <td>${item.grade_level}</td>
+            <td>${item.stream}</td>
+          </tr>`;
+      });
+    })
+    .catch(err => console.error("Error loading reports:", err));
+}
+
+// Fetch reports when section loads
+document.addEventListener("DOMContentLoaded", fetchReports);
+</script>
+<script>
+function loadRecentActivity() {
+  fetch("fetch_recent_activity.php")
+    .then(response => response.json())
+    .then(data => {
+      const activityList = document.getElementById("activity-list");
+      activityList.innerHTML = "";
+
+      if (data.length === 0) {
+        activityList.innerHTML = "<li>No recent activity</li>";
+        return;
+      }
+
+      data.forEach(activity => {
+        const li = document.createElement("li");
+        
+        // Determine status color
+        let statusColor = "red"; // default for failed/error statuses
+        const status = activity.status.toLowerCase();
+        
+        if (status === "sent" ||  status === "delivered") {
+          statusColor = "green";
+        } else if (status === "notsent" || status === "submitted") {
+          statusColor = "orange";
+        }
+        
+        li.innerHTML = `
+          <strong>${activity.content.substring(0, 30)}...</strong><br>
+          <small>
+            Grade: ${activity.grade_level || "All"}, 
+            Stream: ${activity.stream || "All"}, 
+            Boarding: ${activity.boarding_status || "All"}<br>
+            Sent: ${activity.sent_at} 
+            | Status: <span style="color:${statusColor}; font-weight: bold;">
+              ${activity.status}
+            </span>
+          </small>
+        `;
+        activityList.appendChild(li);
+      });
+    })
+    .catch(error => {
+      console.error("Error fetching activity:", error);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", loadRecentActivity);
+</script>
+<script>
+  // SMS Delivery Reports functionality
+let currentPage = 1;
+const itemsPerPage = 20;
+let allMessages = [];
+
+function loadDeliveryReports() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const tableBody = document.getElementById('deliveryReportsBody');
+    
+    loadingIndicator.style.display = 'block';
+    tableBody.innerHTML = '';
+
+    fetch('fetch_delivery_report.php')
+        .then(response => response.json())
+        .then(data => {
+            loadingIndicator.style.display = 'none';
+            
+            if (data.status === 'success') {
+                allMessages = data.data.messages;
+                updateSummaryCards(data.data.summary);
+                displayMessages(currentPage);
+                setupPagination(allMessages.length);
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: #dc3545;">Error loading reports: ${data.message}</td></tr>`;
+            }
+        })
+        .catch(error => {
+            loadingIndicator.style.display = 'none';
+            tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: #dc3545;">Error: ${error.message}</td></tr>`;
+        });
+}
+
+function updateSummaryCards(summary) {
+    let total = 0;
+    let delivered = 0;
+    let notsent = 0;
+    let failed = 0;
+    let submitted = 0;
+
+    // Make sure we're adding numbers, not concatenating strings
+    summary.forEach(item => {
+        total += parseInt(item.count) || 0; // Force conversion to number
+        switch(item.status) {
+            case 'DELIVERED':
+                delivered = parseInt(item.count) || 0;
+                break;
+            case 'SUBMITTED':
+            case 'SENT':
+                submitted += parseInt(item.count) || 0;
+                break;
+            case 'FAILED':
+                failed = parseInt(item.count) || 0;
+                break;
+            case 'NOTSENT':
+                notsent = parseInt(item.count) || 0;
+                break;
+        }
+    });
+
+    // Update the DOM elements
+    document.getElementById('total-messages-count').textContent = total;
+    document.getElementById('delivered-count').textContent = delivered;
+    document.getElementById('notsent-count').textContent = notsent;
+    document.getElementById('failed-count').textContent = failed;
+    document.getElementById('submitted-count').textContent = submitted;
+}
+
+function displayMessages(page) {
+    const tableBody = document.getElementById('deliveryReportsBody');
+    const statusFilter = document.getElementById('statusFilter').value;
+    const gradeFilter = document.getElementById('gradeReportFilter').value;
+    const dateFilter = document.getElementById('dateFilter').value;
+
+    // Filter messages
+    let filteredMessages = allMessages.filter(message => {
+        let matches = true;
+        
+        if (statusFilter && message.status !== statusFilter) {
+            matches = false;
+        }
+        
+        if (gradeFilter && message.grade_level !== gradeFilter) {
+            matches = false;
+        }
+        
+        if (dateFilter) {
+            const messageDate = message.sent_at.split(' ')[0];
+            if (messageDate !== dateFilter) {
+                matches = false;
+            }
+        }
+        
+        return matches;
+    });
+
+    // Calculate pagination
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageMessages = filteredMessages.slice(startIndex, endIndex);
+
+    if (pageMessages.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="8" style="padding: 20px; text-align: center; color: #6c757d;">No messages found</td></tr>`;
+        return;
+    }
+
+    let html = '';
+    pageMessages.forEach(message => {
+        const statusColor = getStatusColor(message.status);
+        const time = new Date(message.sent_at).toLocaleString();
+        const cause = message.cause || 'N/A';
+        
+        html += `
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 12px; font-size: 12px; color: #6c757d;">${time}</td>
+                <td style="padding: 12px; font-weight: 500;">${message.guardian_name}</td>
+                <td style="padding: 12px;">${message.student_name}</td>
+                <td style="padding: 12px; font-family: monospace;">${message.phone_number}</td>
+                <td style="padding: 12px;">${message.grade_level} / ${message.stream}<br>
+                    <small style="color: #6c757d;">${message.boarding_status}</small>
+                </td>
+                <td style="padding: 12px; max-width: 200px;">
+                    <div style="max-height: 60px; overflow: hidden; text-overflow: ellipsis;" title="${message.content}">
+                        ${message.content.substring(0, 50)}${message.content.length > 50 ? '...' : ''}
+                    </div>
+                </td>
+                <td style="padding: 12px;">
+                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; background: ${statusColor.background}; color: ${statusColor.color};">
+                        ${message.status}
+                    </span>
+                </td>
+                <td style="padding: 12px; max-width: 150px;">
+                    <div style="font-size: 11px; color: #6c757d; max-height: 40px; overflow: hidden; text-overflow: ellipsis;" title="${cause}">
+                        ${cause.substring(0, 30)}${cause.length > 30 ? '...' : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = html;
+    setupPagination(filteredMessages.length, page);
+}
+
+function getStatusColor(status) {
+    switch(status) {
+        case 'DELIVERED':
+            return { background: '#d4edda', color: '#155724' };
+        case 'SUBMITTED':
+        case 'SENT':
+            return { background: '#cce7ff', color: '#004085' };
+        case 'NOTSENT':
+            return { background: '#fff3cd', color: '#856404' };
+        case 'FAILED':
+            return { background: '#f8d7da', color: '#721c24' };
+        default:
+            return { background: '#e2e3e5', color: '#383d41' };
+    }
+}
+
+
+function setupPagination(totalItems, currentPage = 1) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const paginationContainer = document.getElementById('deliveryReportsPagination');
+    
+    if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+    
+    // Previous button - smaller and more compact
+    html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+             ‹
+             </button>`;
+    
+    // Always show first page
+    html += `<button onclick="changePage(1)" ${1 === currentPage ? 'class="active"' : ''}>1</button>`;
+    
+    // Show pages around current page
+    let startPage = Math.max(2, currentPage - 1);
+    let endPage = Math.min(totalPages - 1, currentPage + 1);
+    
+    // Add ellipsis after first page if needed
+    if (startPage > 2) {
+        html += `<span class="ellipsis">...</span>`;
+    }
+    
+    // Add middle pages
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>${i}</button>`;
+    }
+    
+    // Add ellipsis before last page if needed
+    if (endPage < totalPages - 1) {
+        html += `<span class="ellipsis">...</span>`;
+    }
+    
+    // Always show last page if there's more than 1 page
+    if (totalPages > 1) {
+        html += `<button onclick="changePage(${totalPages})" ${totalPages === currentPage ? 'class="active"' : ''}>${totalPages}</button>`;
+    }
+    
+    // Next button - smaller and more compact
+    html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+             ›
+             </button>`;
+    
+    // Add page info
+    html += `<span style="margin-left: 10px; font-size: 11px; color: #6c757d;">
+             Page ${currentPage} of ${totalPages}
+             </span>`;
+    
+    paginationContainer.innerHTML = html;
+}
+
+
+function changePage(page) {
+    const totalPages = Math.ceil(allMessages.length / itemsPerPage);
+    if (page < 1 || page > totalPages) return;
+    
+    currentPage = page;
+    displayMessages(page);
+}
+
+function exportToCSV() {
+    // Updated CSV export 
+    const headers = ['Time', 'Guardian', 'Student', 'Phone', 'Grade', 'Stream', 'Boarding', 'Message', 'Status', 'Cause'];
+    const csvContent = [
+        headers.join(','),
+        ...allMessages.map(message => [
+            `"${new Date(message.sent_at).toLocaleString()}"`,
+            `"${message.guardian_name}"`,
+            `"${message.student_name}"`,
+            `"${message.phone_number}"`,
+            `"${message.grade_level}"`,
+            `"${message.stream}"`,
+            `"${message.boarding_status}"`,
+            `"${message.content.replace(/"/g, '""')}"`,
+            `"${message.status}"`,
+            `"${(message.cause || '').replace(/"/g, '""')}"`
+        ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sms-reports-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// Auto-load when section is shown
+
+
+// Add event listeners for filters
+document.addEventListener('DOMContentLoaded', function() {
+    const statusFilter = document.getElementById('statusFilter');
+    const gradeFilter = document.getElementById('gradeReportFilter');
+    const dateFilter = document.getElementById('dateFilter');
+    
+    if (statusFilter) statusFilter.addEventListener('change', () => displayMessages(1));
+    if (gradeFilter) gradeFilter.addEventListener('change', () => displayMessages(1));
+    if (dateFilter) dateFilter.addEventListener('change', () => displayMessages(1));
+});
+</script>
+<script>
+// SMS Reports Information Panel functionality - MINIMAL VERSION
+function toggleInfoPanel() {
+    const infoPanel = document.getElementById('smsReportsInfo');
+    const toggleButton = document.querySelector('.info-toggle');
+    
+    if (!infoPanel || !toggleButton) return;
+    
+    if (infoPanel.style.display === 'none' || infoPanel.style.display === '') {
+        // Show panel
+        infoPanel.style.display = 'block';
+        toggleButton.classList.remove('collapsed');
+        toggleButton.classList.add('expanded');
+    } else {
+        // Hide panel
+        infoPanel.style.display = 'none';
+        toggleButton.classList.remove('expanded');
+        toggleButton.classList.add('collapsed');
+    }
+}
+
+// Enhanced status display with tooltips - SAFE VERSION
+function enhanceStatusDisplay() {
+    const statusCells = document.querySelectorAll('#deliveryReportsTable td:nth-child(7)');
+    
+    statusCells.forEach(cell => {
+        const status = cell.textContent.trim();
+        const row = cell.closest('tr');
+        if (!row) return;
+        
+        const causeCell = row.querySelector('td:nth-child(8)');
+        const cause = causeCell ? causeCell.textContent.trim() : '';
+        
+        // Add tooltip based on status and cause
+        let tooltipText = getStatusExplanation(status, cause);
+        
+        if (tooltipText) {
+            cell.setAttribute('title', tooltipText);
+            cell.style.cursor = 'help';
+        }
+    });
+}
+
+function getStatusExplanation(status, cause) {
+    const explanations = {
+        'UNDELIVERED': 'The recipient\'s phone might be switched off or out of service range.',
+        'FAILED': cause.includes('Route') ? 'The recipient is using a non-Safaricom carrier.' : 
+                 cause.includes('Invalid') ? 'Phone number format is incorrect or no user exists.' :
+                 cause.includes('Blacklisted') ? 'Recipient has blocked messages from STANNSCH. Dial *456*9*5# to unblock.' :
+                 'Message delivery failed. Check phone number and network.',
+        'DELIVERED': 'Message successfully delivered to recipient\'s device.',
+        'SENT': 'Message accepted by SMS gateway and queued for delivery.',
+        'SUBMITTED': 'Message submitted to SMS provider and being processed.',
+        'NOTSENT': 'Message not sent due to system issues or invalid parameters.'
+    };
+    
+    return explanations[status] || `Status: ${status}. ${cause ? 'Cause: ' + cause : ''}`;
+}
+
+// Safe click handler for status cells
+document.addEventListener('click', function(e) {
+    if (e.target.matches('#deliveryReportsTable td:nth-child(7) span')) {
+        const status = e.target.textContent.trim();
+        const row = e.target.closest('tr');
+        if (!row) return;
+        
+        const causeCell = row.querySelector('td:nth-child(8)');
+        const cause = causeCell ? causeCell.textContent.trim() : '';
+        
+        showStatusDetail(status, cause);
+    }
+});
+
+function showStatusDetail(status, cause) {
+    const detail = getStatusExplanation(status, cause);
+    alert(`Status: ${status}\n\n${detail}${cause ? '\n\nCause: ' + cause : ''}`);
+}
+
+// Initialize info panel when page loads - SAFE VERSION
+document.addEventListener('DOMContentLoaded', function() {
+    // Set info panel to be hidden by default
+    const infoPanel = document.getElementById('smsReportsInfo');
+    if (infoPanel) {
+        infoPanel.style.display = 'none';
+    }
+    
+    // Add enhancement to existing displayMessages function without overriding it
+    const originalDisplayMessages = window.displayMessages;
+    if (typeof originalDisplayMessages === 'function') {
+        window.displayMessages = function(page) {
+            const result = originalDisplayMessages(page);
+            // Enhance status display after table is rendered
+            setTimeout(enhanceStatusDisplay, 100);
+            return result;
+        };
+    }
+});
+</script>
+
+  <script src="contacts.js"></script>
+  <script src="students.js"></script>
+</body>
+</html>

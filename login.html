@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css">
+</head> 
+<body>
+  <div class="container">
+    <div class="box form-box">
+      <header>Login</header>
+      <form action="login.php" method="post">
+        <div class="field input">
+          <label for="username">Username</label>
+          <input type="text" name="username" required>
+        </div>
+
+        <div class="field input">
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" autocomplete="off" required>
+        </div>
+
+        <div class="field">
+          <button type="submit" class="btn" style="
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+          ">Login</button>
+        </div>
+
+        <div class="links">
+          Don't have an account? <a href="register.html">Signup</a><br><br>
+          Forgot Password? <a href="forgot_password.html">Click Here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

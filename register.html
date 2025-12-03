@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Register</title>
+      <link rel="stylesheet" href="style.css">
+  </head> 
+  <body>
+      <div class="container">
+          <div class="box form-box">
+            <header>Sign up</header>
+              <form action="Registration.php" method="post">
+                <div class="field input">
+                    <label for ="Fullname">Fullname</label>
+                    <input type="text" name="name" id="name" placeholder="Name" required>
+                </div>
+                <div class="field input">
+                  <label for ="username">Username</label>
+                  <input type="text" name="username" id="email"placeholder="Username" required>
+               </div>
+               <div class="field input">
+                 <label for ="username">Password</label>
+                 <input type="text" name="password" id=" password" autocomplete="off" required>
+               </div>
+               <div class="field input">
+                 <label for="Role">Role</label>
+                 <select name="Role" id="role" required style="height: 40px;border-radius: 5px;">
+                   <option value="" disabled selected>Select a role</option>
+                   <option value="Director">Director</option>
+                   <option value="Headteacher">Headteacher</option>
+                   <option value="Accountant">Accountant</option>
+                   <option value="Secretary">Secretary</option>
+                   <option value="Teacher">Teacher</option>
+                 </select>
+               </div>                
+               <div class="field">
+                <input type="submit"style="
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+          ">
+               </div>
+                <div class="links">
+                  Already a member? <a href="login.html">Sign In</a>
+               </div>
+              </form>
+          </div>
+      </div>
+  </body>
+</html>
